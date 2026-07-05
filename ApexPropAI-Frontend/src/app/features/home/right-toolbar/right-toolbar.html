@@ -1,0 +1,70 @@
+<aside class="right-toolbar" role="toolbar" aria-label="כלי מפה">
+
+  <button class="tb-btn" [class.loading]="scanning" [disabled]="scanning"
+    (click)="scanClicked.emit()" title="סרוק אזור (S)" aria-label="סרוק נכסים באזור הנוכחי">
+    @if (scanning) { <i class="ph-bold ph-circle-notch tb-spin"></i> }
+    @else { <i class="ph-bold ph-magnifying-glass"></i> }
+    @if (scanResultCount !== null && !scanning) {
+      <span class="tb-badge">{{ scanResultCount }}</span>
+    }
+  </button>
+
+  <div class="tb-divider"></div>
+
+  <button class="tb-btn" [class.active]="heatmapActive" (click)="heatmapMenuToggled.emit()"
+    title="מפת חום (H)" aria-label="מפת חום" [attr.aria-pressed]="heatmapActive">
+    <i class="ph-bold ph-fire"></i>
+    @if (heatmapActive) { <span class="tb-active-dot" aria-hidden="true"></span> }
+  </button>
+
+  @if (showHeatmapMenu) {
+  <div class="tb-submenu" role="menu">
+    <p class="tb-submenu-title">שכבת חום</p>
+    @for (opt of heatmapOptions; track opt.key) {
+    <button class="tb-submenu-item" [class.selected]="heatmapLayer === opt.key"
+      (click)="heatmapLayerChanged.emit(opt.key)" role="menuitem">
+      <i [class]="opt.icon"></i> {{ opt.label }}
+    </button>
+    }
+    @if (heatmapActive) {
+    <button class="tb-submenu-off" (click)="heatmapToggled.emit()">
+      <i class="ph-bold ph-x"></i> כבה
+    </button>
+    }
+  </div>
+  }
+
+  <button class="tb-btn" [class.active]="drawModeActive" (click)="drawModeToggled.emit()"
+    title="ציר אזור" aria-label="ציר פולגון חיפוש" [attr.aria-pressed]="drawModeActive">
+    <i class="ph-bold ph-polygon"></i>
+  </button>
+
+  @if (drawnPolygon) {
+  <button class="tb-btn tb-btn-danger" (click)="drawingCleared.emit()"
+    title="מחק ציור" aria-label="מחק ציור">
+    <i class="ph-bold ph-trash"></i>
+  </button>
+  }
+
+  <div class="tb-divider"></div>
+
+  @for (style of mapStyles; track style.key) {
+  <button class="tb-btn" [class.active]="mapTileStyle === style.key"
+    (click)="mapStyleChanged.emit(style.key)"
+    [title]="style.label" [attr.aria-label]="'סגנון מפה: ' + style.label"
+    [attr.aria-pressed]="mapTileStyle === style.key">
+    <i [class]="style.icon"></i>
+  </button>
+  }
+
+  <div class="tb-divider"></div>
+
+  <button class="tb-btn" [class.active]="drawerOpen" (click)="drawerToggled.emit()"
+    [title]="drawerOpen ? 'סגור תוצאות' : 'הצג תוצאות'" [attr.aria-expanded]="drawerOpen">
+    <i class="ph-bold" [class.ph-list]="!drawerOpen" [class.ph-x]="drawerOpen"></i>
+    @if (scanResultCount && !drawerOpen) {
+      <span class="tb-badge">{{ scanResultCount }}</span>
+    }
+  </button>
+
+</aside>

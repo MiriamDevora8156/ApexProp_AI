@@ -1,0 +1,119 @@
+<nav class="navbar px-4 py-2.5 flex items-center justify-between" dir="rtl" role="navigation" aria-label="ניווט ראשי">
+
+  <!-- לוגו -->
+  <a routerLink="/home"
+    class="flex items-center gap-2 text-white font-black text-xl tracking-tight hover:opacity-80 transition-opacity"
+    aria-label="ApexProp — דף הבית">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+      <rect width="28" height="28" rx="8" fill="rgba(59,130,246,0.15)"/>
+      <path d="M7 20L14 8L21 20" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10 15.5H18" stroke="#60A5FA" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span>Apex<span class="text-[#3B82F6]">Prop</span></span>
+  </a>
+
+  <!-- פעולות ימין -->
+  <div class="flex items-center gap-2">
+
+    <!-- Badge השוואה (כשיש נכסים) -->
+
+    <!-- אורח -->
+    @if (!authService.isLoggedIn()) {
+      <a routerLink="/"
+        class="px-4 py-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-bold text-sm rounded-xl
+               transition-all shadow-[0_4px_12px_rgba(59,130,246,0.3)]">
+        התחברות
+      </a>
+    }
+
+    <!-- מחובר — Avatar + Dropdown -->
+    @if (authService.isLoggedIn()) {
+      <div class="relative navbar-avatar-wrapper">
+
+        <button
+          (click)="toggleDropdown()"
+          [attr.aria-expanded]="dropdownOpen()"
+          aria-haspopup="true"
+          [attr.aria-label]="'תפריט משתמש — ' + (authService.currentUser()?.fullName ?? '')"
+          class="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8c54ff]
+                 text-white font-black text-sm flex items-center justify-center
+                 hover:scale-105 transition-all shadow-[0_0_14px_rgba(59,130,246,0.35)]
+                 cursor-pointer select-none ring-2 ring-transparent
+                 hover:ring-[#3B82F6]/40 focus-visible:ring-[#3B82F6]"
+          tabindex="0">
+          {{ getInitial() }}
+        </button>
+
+        <!-- Dropdown -->
+        @if (dropdownOpen()) {
+          <div
+            class="absolute left-0 top-11 w-56 rounded-2xl border border-[rgba(148,163,184,0.12)]
+                   bg-[#1E293B] shadow-[0_16px_48px_rgba(0,0,0,0.5)] z-50 overflow-hidden
+                   animate-fade-in-up"
+            role="menu"
+            aria-label="תפריט משתמש">
+
+            <!-- פרטי משתמש -->
+            <div class="px-4 py-3 border-b border-[rgba(148,163,184,0.08)]">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8c54ff]
+                            flex items-center justify-center text-white font-black text-sm flex-shrink-0">
+                  {{ getInitial() }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-white font-bold text-sm truncate">{{ authService.currentUser()?.fullName }}</p>
+                  <p class="text-[#94A3B8] text-xs truncate">{{ authService.currentUser()?.email }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- פריטי תפריט -->
+            <div class="py-1" role="none">
+
+              <a routerLink="/compare"
+                (click)="dropdownOpen.set(false)"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#CBD5E1]
+                       hover:bg-white/5 hover:text-white transition-all"
+                role="menuitem"
+                tabindex="0">
+                <span class="text-base" aria-hidden="true">⚖️</span>
+                <span>זירת ההשוואה שלי</span>
+                @if (compareService.count() > 0) {
+                  <span class="mr-auto bg-[#8c54ff]/20 text-[#8c54ff] text-[10px]
+                               font-bold px-2 py-0.5 rounded-full"
+                        aria-hidden="true">
+                    {{ compareService.count() }}
+                  </span>
+                }
+              </a>
+
+              <a routerLink="/saved"
+                (click)="dropdownOpen.set(false)"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#CBD5E1]
+                       hover:bg-white/5 hover:text-white transition-all"
+                role="menuitem"
+                tabindex="0">
+                <span class="text-base" aria-hidden="true">❤️</span>
+                <span>הנכסים ששמרתי</span>
+              </a>
+
+              <div role="separator" class="border-t border-[rgba(148,163,184,0.08)] my-1"></div>
+
+              <button
+                (click)="logout()"
+                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400
+                       hover:bg-red-500/10 transition-all text-right"
+                role="menuitem"
+                tabindex="0">
+                <span class="text-base" aria-hidden="true">🚪</span>
+                <span>התנתקות</span>
+              </button>
+
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</nav>

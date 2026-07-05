@@ -1,0 +1,52 @@
+<div class="glass-card p-6 rounded-3xl border border-accent-blue/20 bg-accent-blue/5">
+    <h3 class="text-xl font-bold text-accent-ice mb-2">🧪 סימולטור "מה אם"</h3>
+    <p class="text-[#94A3B8] text-sm mb-6">שנה את הפרמטרים וראה איך הציון משתנה</p>
+    <div class="space-y-6">
+        <div>
+            <div class="flex justify-between mb-2">
+                <label class="text-[#CBD5E1] text-sm font-bold">💰 מחיר</label>
+                <span class="text-accent-ice font-bold text-sm">₪{{ (simPrice() | number:'1.0-0') }}</span>
+            </div>
+            <input type="range" [min]="property!.price * 0.5" [max]="property!.price * 2" [step]="10000"
+                [value]="simPrice()" (input)="simPrice.set(+$any($event.target).value); calculateSimScore()"
+                class="w-full h-2 rounded-lg appearance-none cursor-pointer" style="accent-color: #3B82F6">
+        </div>
+        <div>
+            <div class="flex justify-between mb-2">
+                <label class="text-[#CBD5E1] text-sm font-bold">🛏️ חדרים</label>
+                <span class="text-accent-ice font-bold text-sm">{{ simRooms() }}</span>
+            </div>
+            <input type="range" min="1" max="10" step="1" [value]="simRooms()"
+                (input)="simRooms.set(+$any($event.target).value); calculateSimScore()"
+                class="w-full h-2 rounded-lg appearance-none cursor-pointer" style="accent-color: #3B82F6">
+        </div>
+        <div>
+            <div class="flex justify-between mb-2">
+                <label class="text-[#CBD5E1] text-sm font-bold">📐 שטח (מ"ר)</label>
+                <span class="text-accent-ice font-bold text-sm">{{ simArea() }} מ"ר</span>
+            </div>
+            <input type="range" min="30" max="300" step="5" [value]="simArea()"
+                (input)="simArea.set(+$any($event.target).value); calculateSimScore()"
+                class="w-full h-2 rounded-lg appearance-none cursor-pointer" style="accent-color: #3B82F6">
+        </div>
+    </div>
+    @if (simScore() !== null) {
+    <div class="mt-6 p-4 rounded-2xl border" [class.border-[#10B981]]="getSimScoreDiff() > 0"
+        [class.border-red-500]="getSimScoreDiff() < 0" [class.border-white]="getSimScoreDiff() === 0"
+        [class.bg-[#10B981]/10]="getSimScoreDiff() > 0" [class.bg-red-500/10]="getSimScoreDiff() < 0">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-[#94A3B8] text-xs mb-1">ציון משוער</p>
+                <p class="text-4xl font-black" [style.color]="getSimScoreColor()">{{ simScore() }}</p>
+            </div>
+            <div class="text-left">
+                <p class="text-[#94A3B8] text-xs mb-1">שינוי</p>
+                <p class="text-2xl font-bold" [class.text-[#10B981]]="getSimScoreDiff() > 0"
+                    [class.text-red-400]="getSimScoreDiff() < 0" [class.text-[#94A3B8]]="getSimScoreDiff() === 0">
+                    {{ getSimScoreDiff() > 0 ? '+' : '' }}{{ getSimScoreDiff() }}
+                </p>
+            </div>
+        </div>
+    </div>
+    }
+</div>

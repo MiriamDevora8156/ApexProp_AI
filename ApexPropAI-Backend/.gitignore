@@ -1,0 +1,6 @@
+**/Properties/launchSettings.json
+**/appsettings.Development.json
+
+# Build folders
+[Bb]in/
+[Oo]bj/

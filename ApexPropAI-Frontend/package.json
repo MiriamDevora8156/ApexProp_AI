@@ -1,0 +1,64 @@
+{
+  "name": "property-insight-ai-client",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "serve:ssr:PropertyInsightAI-Client": "node dist/PropertyInsightAI-Client/server/server.mjs"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@10.8.3",
+  "dependencies": {
+    "@angular/animations": "^21.2.10",
+    "@angular/cdk": "^21.2.12",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/material": "^21.2.12",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/platform-server": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "@angular/ssr": "^21.0.4",
+    "@phosphor-icons/web": "^2.1.2",
+    "@types/leaflet.markercluster": "^1.5.6",
+    "chart.js": "^4.5.1",
+    "express": "^5.1.0",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
+    "primeicons": "^7.0.0",
+    "primeng": "^21.1.6",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.0.4",
+    "@angular/cli": "^21.0.4",
+    "@angular/compiler-cli": "^21.0.0",
+    "@types/express": "^5.0.1",
+    "@types/google.maps": "^3.64.0",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20.17.19",
+    "autoprefixer": "^10.4.18",
+    "jsdom": "^27.1.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}

@@ -1,0 +1,19 @@
+<div class="mobile-sheet" [class.open]="drawerOpen">
+  <div class="sheet-handle" aria-hidden="true"></div>
+  <div class="sheet-scroll">
+    @for (p of properties; track p.id) {
+    <a class="compact-card" [routerLink]="['/property', p.id]">
+      <img [src]="p.images[0] || 'assets/images/placeholder.jpg'"
+        [alt]="p.title" class="compact-img" loading="lazy">
+      <div class="compact-info">
+        <p class="compact-title">{{ p.title }}</p>
+        <p class="compact-price">₪{{ p.price | number:'1.0-0' }}</p>
+        <p class="compact-sub">{{ p.rooms }} חד׳ · {{ p.areaSqm }}מ"ר</p>
+      </div>
+      <span class="compact-score" [style.color]="getScoreColor(p.aiScore)">
+        {{ p.aiScore | number:'1.0-0' }}
+      </span>
+    </a>
+    }
+  </div>
+</div>

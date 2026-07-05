@@ -1,0 +1,120 @@
+<div class="prop-list-root">
+  <div class="drawer-header">
+    <div class="drawer-top">
+      <span class="drawer-title">
+        <i class="ph-bold ph-house-line"></i>
+        {{ scanResultCount !== null ? scanResultCount + ' נכסים' : 'נכסים' }}
+      </span>
+      <button class="drawer-close" (click)="drawerClosed.emit()" aria-label="סגור">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+    <div class="sort-bar" role="group" aria-label="מיון">
+      @for (s of sortOptions; track s.key) {
+        <button class="sort-chip" [class.active]="sortField === s.key"
+          (click)="sortChanged.emit(s.key)" [attr.aria-pressed]="sortField === s.key">
+          <i [class]="s.icon"></i> {{ s.label }}
+        </button>
+      }
+    </div>
+    <button class="flip-toggle" (click)="drawerSideToggled.emit()" style="margin-top:6px">
+      <i class="ph-bold ph-arrow-left"></i> חזור למודיעין
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    @if (loading) {
+      @for (i of [1,2,3,4]; track i) {
+        <div class="prop-card skeleton">
+          <div class="skel-img shimmer"></div>
+          <div class="skel-body">
+            <div class="skel-line shimmer" style="width:70%"></div>
+            <div class="skel-line shimmer" style="width:45%;height:10px;margin-top:6px"></div>
+            <div class="skel-line shimmer" style="width:100%;height:34px;margin-top:12px;border-radius:10px"></div>
+          </div>
+        </div>
+      }
+    } @else if (error) {
+      <div class="state-box">
+        <i class="ph-bold ph-warning-circle state-icon error"></i>
+        <p class="state-title">שגיאת תקשורת</p>
+        <p class="state-msg">{{ error }}</p>
+        <button class="state-btn" (click)="refreshRequested.emit()">
+          <i class="ph-bold ph-arrow-clockwise"></i> נסה שוב
+        </button>
+      </div>
+    } @else if (!properties.length) {
+      <div class="state-box">
+        <i class="ph-bold ph-map-trifold state-icon"></i>
+        <p class="state-title">לא נמצאו נכסים</p>
+        <p class="state-msg">נסה להרחיב את האזור</p>
+        <button class="state-btn" (click)="zoomOutRequested.emit()">
+          <i class="ph-bold ph-arrows-out"></i> הרחב אזור
+        </button>
+      </div>
+    } @else {
+      @for (property of properties; track property.id) {
+        <div class="prop-card"
+          [class.anomaly]="isAnomaly(property.id)"
+          [class.highlighted]="hoveredPropertyId === property.id"
+          [id]="'card-' + property.id"
+          (mouseenter)="propertyHovered.emit(property.id)"
+          (mouseleave)="propertyHovered.emit(null)">
+
+          @if (isAnomaly(property.id)) {
+            <div class="card-ribbon"><i class="ph-fill ph-diamond"></i> הזדמנות</div>
+          }
+
+          <div class="card-img-wrap">
+            <img [src]="property.images.length ? property.images[0] : 'assets/images/placeholder.jpg'"
+              [alt]="'תמונת הנכס ' + property.title" class="card-img" loading="lazy">
+            <div class="card-img-fade" aria-hidden="true"></div>
+            <div class="ai-badge" [style.color]="getScoreColor(property.aiScore)"
+              [attr.aria-label]="'ציון AI: ' + property.aiScore">
+              <i class="ph-bold ph-robot" aria-hidden="true"></i>
+              <span class="ai-score">{{ property.aiScore | number:'1.0-0' }}</span>
+            </div>
+            @if (isAnomaly(property.id)) {
+              <span class="anomaly-badge" role="status">
+                <i class="ph-fill ph-trend-up"></i> מתחת לשוק
+              </span>
+            }
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">{{ property.title }}</h3>
+            <p class="card-addr">
+              <i class="ph-bold ph-map-pin" aria-hidden="true"></i> {{ property.address }}
+            </p>
+            <div class="card-stats">
+              <span><i class="ph-bold ph-bed"></i> {{ property.rooms }}</span>
+              <span><i class="ph-bold ph-ruler"></i> {{ property.areaSqm }}מ"ר</span>
+              <span><i class="ph-bold ph-chart-bar"></i> ₪{{ (property.price / property.areaSqm) | number:'1.0-0' }}/מ"ר</span>
+            </div>
+            <div class="card-price-block">
+              <div class="price-row">
+                <span class="price-lbl">מחיר</span>
+                <span class="price-val">₪{{ property.price | number:'1.0-0' }}</span>
+              </div>
+              <div class="price-row">
+                <span class="price-lbl">שווי AI</span>
+                <span class="price-est" [class.green]="isAnomaly(property.id)">
+                  ₪{{ property.estimatedValue | number:'1.0-0' }}
+                </span>
+              </div>
+              @if (isAnomaly(property.id)) {
+                <div class="anomaly-gap">
+                  <i class="ph-bold ph-rocket-launch"></i>
+                  פער {{ ((property.estimatedValue! - property.price) / property.price * 100) | number:'1.1-1' }}%
+                </div>
+              }
+            </div>
+            <a [routerLink]="['/property', property.id]" class="cta-btn">
+              <i class="ph-bold ph-chart-line-up"></i> ניתוח מלא
+            </a>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

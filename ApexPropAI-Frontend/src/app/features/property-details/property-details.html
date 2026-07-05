@@ -1,0 +1,363 @@
+@if (property()) {
+<div class="min-h-screen bg-bg-primary text-white p-4 md:p-8 relative overflow-hidden" dir="rtl">
+
+  <div class="absolute top-[-10%] left-[-10%] w-96 h-96 opacity-15 blur-[120px] rounded-full"
+    style="background: radial-gradient(circle, #1d4ed8, transparent)"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 opacity-10 blur-[120px] rounded-full"
+    style="background: radial-gradient(circle, #8c54ff, transparent)"></div>
+
+  <button routerLink="/home"
+    class="relative z-10 mb-6 flex items-center text-[#94A3B8] hover:text-accent-ice transition-all group font-semibold">
+    <span class="ml-2 group-hover:-translate-x-1 transition-transform">←</span> חזור לחיפוש
+  </button>
+
+  <div class="relative z-10 mb-8">
+    <div class="glass-card rounded-3xl overflow-hidden border border-white/10">
+      <div class="relative h-[320px] md:h-[400px]">
+        <img [src]="property()?.images?.[0] || '.././assets/images/placeholder-house.jpg'"
+          class="w-full h-full object-cover" alt="Property Image">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+        <div class="absolute bottom-6 right-6 glass-card px-6 py-3 rounded-2xl border-accent-blue/30">
+          <span class="text-3xl font-black text-accent-ice">₪{{ (property()?.price | number:'1.0-0') }}</span>
+        </div>
+
+        @if (isMarketAnomaly()) {
+        <div class="absolute top-4 right-4 flex flex-col gap-2">
+          <div class="flex items-center gap-2 bg-black/80 backdrop-blur-md
+                      border border-[#10B981]/60 rounded-xl px-3 py-2 animate-pulse">
+            <div class="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]"></div>
+            <span class="text-[#10B981] text-xs font-black tracking-wider uppercase">
+              💎 הזדמנות שוק זוהתה
+            </span>
+          </div>
+          <div class="bg-black/80 backdrop-blur-md border border-[#10B981]/30 rounded-xl px-3 py-2 text-center">
+            <p class="text-[#94A3B8] text-[10px]">פער שוק</p>
+            <p class="text-[#10B981] font-black text-sm">+₪{{ (anomalyGap() | number:'1.0-0') }}</p>
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="p-6 md:p-8">
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-2">{{ property()?.title }}</h1>
+            <p class="text-[#94A3B8] text-lg flex items-center">
+              <span class="ml-2 text-accent-ice">📍</span> {{ property()?.address }}
+            </p>
+          </div>
+          @if (aiAnalysis()?.aiScore) {
+          <div class="text-center bg-white/5 rounded-2xl px-6 py-3 border border-white/10">
+            <p class="text-[#94A3B8] text-xs uppercase tracking-wider mb-1">AI Score</p>
+            <p class="text-3xl font-black" [style.color]="getScoreColor(aiAnalysis()!.aiScore)">
+              {{ animatedScore() }}
+            </p>
+          </div>
+          }
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
+          <div class="text-center">
+            <span class="block text-[#94A3B8] text-xs uppercase tracking-wider mb-1">חדרים</span>
+            <span class="text-3xl font-bold text-accent-ice">{{ property()?.rooms }}</span>
+          </div>
+          <div class="text-center border-x border-white/10">
+            <span class="block text-[#94A3B8] text-xs uppercase tracking-wider mb-1">שטח</span>
+            <span class="text-3xl font-bold text-accent-ice">{{ property()?.areaSqm }}</span>
+            <span class="text-xs text-[#94A3B8]">מ"ר</span>
+          </div>
+          <div class="text-center">
+            <span class="block text-[#94A3B8] text-xs uppercase tracking-wider mb-1">מחיר למ"ר</span>
+            <span class="text-3xl font-bold text-accent-ice">
+              {{ (property()!.price / property()!.areaSqm | number:'1.0-0') }}
+            </span>
+            <span class="text-xs text-[#94A3B8]">₪</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <mat-tab-group (selectedTabChange)="onTabChange($event)" class="mb-6 z-10 relative custom-mat-tabs">
+
+    <mat-tab label="🏠 מבט על">
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
+
+        <div class="lg:col-span-2 space-y-6">
+          @if (property()?.description) {
+          <div class="glass-card p-6 rounded-3xl border border-white/5">
+            <h3 class="font-bold mb-3 text-[#94A3B8]">📝 תיאור הנכס</h3>
+            <p class="text-[#CBD5E1] leading-relaxed">{{ property()?.description }}</p>
+          </div>
+          }
+
+          @if (nearbyProperties().length > 0) {
+          <div class="glass-card p-6 rounded-3xl border border-[#8c54ff]/20 bg-[#8c54ff]/5">
+            <h3 class="text-xl font-bold text-[#8c54ff] mb-4">📍 נכסים סמוכים באזור</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (nearby of nearbyProperties(); track nearby.id) {
+              <div [routerLink]="['/property', nearby.id]" class="cursor-pointer group hover:scale-105 transition-all">
+                <div class="glass-card p-4 border border-[#8c54ff]/30 hover:border-[#8c54ff]/60 transition-all">
+                  <div class="flex gap-4">
+                    <img [src]="nearby.images[0] || 'assets/images/placeholder-house.jpg'"
+                      class="w-20 h-20 rounded-xl object-cover group-hover:scale-110 transition-transform">
+                    <div class="flex-1 min-w-0">
+                      <h4 class="text-white font-bold truncate group-hover:text-[#8c54ff] transition-colors">{{
+                        nearby.title }}</h4>
+                      <p class="text-[#94A3B8] text-sm">{{ nearby.address }}</p>
+                      <p class="text-accent-ice font-bold mt-1">₪{{ (nearby.price | number:'1.0-0') }}</p>
+                      <p class="text-[#8c54ff] text-xs">🤖 {{ nearby.aiScore.toFixed(1) }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+          }
+
+          <div class="glass-card p-6 rounded-3xl border border-white/5">
+            <h3 class="font-bold mb-4 flex items-center"><span class="ml-2">📊</span> סטטיסטיקות</h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between text-[#CBD5E1]">
+                <span>סוג נכס</span>
+                <span class="text-accent-ice font-semibold">דירה</span>
+              </div>
+              <div class="flex justify-between text-[#CBD5E1]">
+                <span>תאריך רישום</span>
+                <span class="text-accent-ice font-semibold">{{ (property()!.createdAt | date:'dd/MM/yyyy') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="glass-card p-8 rounded-3xl border border-accent-blue/20 bg-accent-blue/5 text-center">
+            <h3 class="text-accent-ice font-bold tracking-widest text-sm mb-6 uppercase">🤖 ציון השקעה</h3>
+            <div class="relative inline-flex items-center justify-center">
+              <svg class="w-48 h-48 transform -rotate-90">
+                <circle cx="96" cy="96" r="88" stroke="rgba(255,255,255,0.05)" stroke-width="12" fill="transparent" />
+                @if (aiAnalysis()?.aiScore) {
+                <circle cx="96" cy="96" r="88" [attr.stroke]="getScoreColor(aiAnalysis()!.aiScore)" stroke-width="12"
+                  fill="transparent" [style.strokeDasharray]="553"
+                  [style.strokeDashoffset]="553 - (553 * (animatedScore() / 100))" stroke-linecap="round"
+                  style="transition: stroke-dashoffset 0.05s linear" />
+                }
+              </svg>
+              <div class="absolute text-center">
+                <span class="text-6xl font-black text-white">{{ animatedScore() }}</span>
+                <span class="block text-[#94A3B8] text-xs mt-1">מתוך 100</span>
+              </div>
+            </div>
+            @if (aiAnalysis()?.recommendation) {
+            <div class="mt-6 p-4 bg-accent-blue/10 rounded-lg border border-accent-blue/30">
+              <p class="text-accent-ice font-semibold text-sm">💡 המלצה</p>
+              <p class="text-[#CBD5E1] text-xs mt-2">{{ aiAnalysis()?.recommendation }}</p>
+            </div>
+            }
+          </div>
+
+          <button (click)="toggleCompare()" class="w-full py-4 font-bold rounded-2xl transition-all duration-300 border"
+            [class.bg-[#8c54ff]]="compareService.isInList(property()!.id)"
+            [class.text-white]="compareService.isInList(property()!.id)"
+            [class.border-[#8c54ff]]="compareService.isInList(property()!.id)"
+            [class.bg-accent-blue/10]="!compareService.isInList(property()!.id)"
+            [class.text-accent-ice]="!compareService.isInList(property()!.id)"
+            [class.border-accent-blue/30]="!compareService.isInList(property()!.id)">
+            {{ compareService.isInList(property()!.id) ? '✅ נוסף להשוואה' : '⚖️ הוסף להשוואה' }}
+          </button>
+
+          @if (authService.isLoggedIn()) {
+          <button (click)="toggleSave()"
+            class="w-full py-4 font-bold rounded-2xl transition-all duration-300 border mb-3"
+            [class.bg-red-500]="savedService.isSaved(property()!.id)"
+            [class.text-white]="savedService.isSaved(property()!.id)"
+            [class.border-red-500]="savedService.isSaved(property()!.id)"
+            [class.bg-white/5]="!savedService.isSaved(property()!.id)"
+            [class.text-white]="!savedService.isSaved(property()!.id)"
+            [class.border-white/20]="!savedService.isSaved(property()!.id)">
+            {{ savedService.isSaved(property()!.id) ? '❤️ הסר משמורים' : '🤍 שמור נכס' }}
+          </button>
+          } @else {
+          <button matTooltip="התחבר כדי לשמור נכס" [disabled]="true"
+            class="w-full py-4 font-bold rounded-2xl border mb-3 bg-white/5 text-[#475569] border-white/10 opacity-50 cursor-not-allowed">
+            🔒 התחבר כדי לשמור
+          </button>
+          }
+
+          <button (click)="exportToPDF()" class="w-full mb-3 py-4 bg-white/5 border border-white/20 text-white font-bold
+                   rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+            <span>📄</span> הורד דו"ח מודיעין (PDF)
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="🔬 ניתוח עומק">
+      <div class="relative pt-6">
+        @if (!authService.isLoggedIn()) {
+        <div
+          class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md rounded-3xl mt-6">
+          <div
+            class="glass-card p-8 text-center max-w-sm border border-accent-blue/30 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+            <span class="text-4xl mb-4 block">🔒</span>
+            <h3 class="text-xl font-bold text-white mb-2">גלה את ניתוח ה-AI המלא</h3>
+            <p class="text-[#94A3B8] text-sm mb-6">תחזיות, השוואות ורדאר חכם זמינים למשתמשים רשומים בלבד.</p>
+            <button routerLink="/" [queryParams]="{ returnUrl: '/property/' + property()?.id }"
+              class="w-full py-3 bg-accent-blue text-white font-bold rounded-xl hover:bg-[#2563EB] transition-all">
+              הרשמה מהירה בחינם
+            </button>
+          </div>
+        </div>
+        }
+
+        <div [class.blur-md]="!authService.isLoggedIn()" [class.pointer-events-none]="!authService.isLoggedIn()"
+          class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 transition-all duration-500">
+
+          <div class="glass-card p-6 rounded-3xl border border-white/5">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold">📈 חיזוי מחיר</h3>
+              @if (property()?.estimatedValue; as ev) {
+              <span class="text-[#10B981] bg-[#10B981]/10 px-3 py-1 rounded-lg text-sm font-bold">
+                צפוי: +{{ ((ev - property()!.price) / property()!.price * 100).toFixed(1) }}%
+              </span>
+              }
+            </div>
+            <div class="h-[260px] w-full"><canvas #priceChart></canvas></div>
+          </div>
+
+          <div class="glass-card p-6 rounded-3xl border border-accent-blue/20 bg-accent-blue/5">
+            <h3 class="text-xl font-bold text-accent-ice mb-2">🕸️ ניתוח רדאר</h3>
+            <p class="text-[#94A3B8] text-xs mb-4">ניתוח רב-ממדי של הנכס</p>
+            <div class="h-[260px] w-full"><canvas #radarChart></canvas></div>
+            <div class="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10 italic text-sm text-[#CBD5E1]">
+              {{ radarSummary() }}
+            </div>
+          </div>
+
+          <app-nearby-locations [nearbyLocations]="nearbyLocations()">
+          </app-nearby-locations>
+
+          <app-simulator [property]="property()!" [aiAnalysis]="aiAnalysis()" [nearbyLocations]="nearbyLocations()">
+          </app-simulator>
+
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="🚀 תחזית ומומנטום">
+      <div class="relative pt-6">
+        @if (!authService.isLoggedIn()) {
+        <div
+          class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md rounded-3xl mt-6">
+          <div
+            class="glass-card p-8 text-center max-w-sm border border-[#8c54ff]/30 shadow-[0_0_30px_rgba(140,84,255,0.1)]">
+            <span class="text-4xl mb-4 block">🔮</span>
+            <h3 class="text-xl font-bold text-white mb-2">תחזית ומומנטום עתידי</h3>
+            <p class="text-[#94A3B8] text-sm mb-6">צפה בציר הזמן של ה-AI להערכת שווי עתידית.</p>
+            <button routerLink="/" [queryParams]="{ returnUrl: '/property/' + property()?.id }"
+              class="w-full py-3 bg-[#8c54ff] text-white font-bold rounded-xl hover:bg-[#7c3aed] transition-all">
+              הרשמה מהירה בחינם
+            </button>
+          </div>
+        </div>
+        }
+
+        <div [class.blur-md]="!authService.isLoggedIn()" [class.pointer-events-none]="!authService.isLoggedIn()"
+          class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-500">
+
+          <div class="space-y-6">
+            <div class="glass-card p-6 rounded-3xl border border-white/10">
+              <label class="text-[#94A3B8] text-sm block mb-3 font-bold">📅 בחר מספר שנים:</label>
+              <div class="flex gap-2 mb-4">
+                @for (year of [1, 3, 5, 10]; track year) {
+                <button (click)="onYearsChange({target: {value: year}})" [class.bg-accent-blue]="yearsAhead() === year"
+                  [class.text-white]="yearsAhead() === year" [class.bg-white/10]="yearsAhead() !== year"
+                  [class.text-[#94A3B8]]="yearsAhead() !== year"
+                  class="flex-1 px-3 py-2 rounded-lg text-sm font-bold transition-all hover:scale-105">
+                  +{{ year }}y
+                </button>
+                }
+              </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl border border-[#8c54ff]/20 bg-[#8c54ff]/5">
+              <div class="flex items-center mb-4">
+                <span class="text-[#8c54ff] ml-3 text-2xl">📈</span>
+                <h3 class="font-bold">הערכת שווי עתידית</h3>
+              </div>
+              @if (property()?.estimatedValue; as ev) {
+              <div class="space-y-3">
+                <div class="flex justify-between text-sm text-[#94A3B8]">
+                  <span>מחיר כעת</span>
+                  <span>₪{{ (property()!.price | number:'1.0-0') }}</span>
+                </div>
+                <div class="flex justify-between text-xl font-bold text-white">
+                  <span>בעוד {{ yearsAhead() }} שנים</span>
+                  <span class="text-[#8c54ff]">₪{{ (ev | number:'1.0-0') }}</span>
+                </div>
+                <p class="text-center text-[#10B981] font-bold text-sm">
+                  +{{ ((ev - property()!.price) / property()!.price * 100).toFixed(1) }}%
+                </p>
+              </div>
+              } @else {
+              <div class="animate-pulse h-20 bg-white/5 rounded-lg"></div>
+              }
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 glass-card p-6 rounded-3xl border border-white/5">
+            <h3 class="text-xl font-bold mb-2">⏱️ AI Market Lifecycle</h3>
+            <p class="text-[#94A3B8] text-xs mb-8">ה-AI מנתח ומקשר בין שינויי מחיר לאירועים בסביבה</p>
+            <app-timeline [property]="property()!" [priceHistory]="priceHistory()" [yearsAhead]="yearsAhead()">
+            </app-timeline>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  @if (compareService.count() > 1) {
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass-card px-6 py-3 rounded-2xl
+              border border-[#8c54ff]/50 flex items-center gap-4 shadow-2xl">
+    <span class="text-white font-bold">⚖️ {{ compareService.count() }} נכסים נבחרו</span>
+    <button routerLink="/compare"
+      class="px-4 py-2 bg-[#8c54ff] text-white font-bold rounded-xl hover:bg-[#7c3aed] transition-all text-sm">
+      השווה עכשיו
+    </button>
+  </div>
+  }
+
+  <div class="relative z-10 mt-6 glass-card p-0 rounded-3xl border border-white/5 overflow-hidden">
+    <div class="p-6 border-b border-white/5">
+      <h3 class="font-bold flex items-center gap-2"><span>🗺️</span> מיקום הנכס</h3>
+    </div>
+    <div #mapContainer class="h-[300px] w-full z-0"></div>
+  </div>
+
+</div>
+}
+
+@else if (loading()) {
+<div class="min-h-screen bg-bg-primary flex items-center justify-center">
+  <div class="text-center">
+    <div class="w-16 h-16 mx-auto mb-4 border-4 border-accent-blue/30 border-t-accent-blue rounded-full animate-spin">
+    </div>
+    <p class="text-accent-ice text-xl font-bold">טוען פרטי נכס...</p>
+  </div>
+</div>
+}
+
+@else if (error()) {
+<div class="min-h-screen bg-bg-primary flex items-center justify-center p-4">
+  <div class="glass-card p-8 rounded-3xl text-center max-w-md">
+    <p class="text-red-400 text-2xl font-bold mb-4">❌</p>
+    <p class="text-[#94A3B8] mb-6">{{ error() }}</p>
+    <button routerLink="/"
+      class="px-6 py-3 bg-accent-blue text-white font-bold rounded-xl hover:bg-[#2563EB] transition-all">
+      חזור לעמוד הבית
+    </button>
+  </div>
+</div>
+}

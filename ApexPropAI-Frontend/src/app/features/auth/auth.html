@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-midnight-base flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
+  <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-ai-neon opacity-15 blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-ai-purple opacity-15 blur-[120px] rounded-full"></div>
+
+  <div class="relative z-10 w-full max-w-md">
+    <div class="glass-card rounded-3xl p-8 border border-white/10">
+
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-black text-white mb-2">
+          Property<span class="text-ai-neon">Insight</span>
+        </h1>
+        <p class="text-gray-400">ניתוח נדל"ן עם בינה מלאכותית</p>
+      </div>
+
+      <div class="flex gap-4 mb-8 bg-white/5 p-1 rounded-xl">
+        <button (click)="isLogin.set(true)" [class.bg-ai-neon/20]="isLogin()" [class.text-ai-neon]="isLogin()"
+          [class.text-gray-400]="!isLogin()" class="flex-1 py-2 rounded-lg font-bold transition-all">
+          התחברות
+        </button>
+        <button (click)="isLogin.set(false)" [class.bg-ai-neon/20]="!isLogin()" [class.text-ai-neon]="!isLogin()"
+          [class.text-gray-400]="isLogin()" class="flex-1 py-2 rounded-lg font-bold transition-all">
+          הרשמה
+        </button>
+      </div>
+
+      <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)">
+        @if (!isLogin()) {
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm mb-2 font-semibold">שם מלא</label>
+          <input ngModel name="fullName" type="text" required minlength="2" #nameCtrl="ngModel" placeholder="שם מלא"
+            class="auth-input" [class.border-red-500]="nameCtrl.invalid && nameCtrl.touched">
+          @if (nameCtrl.invalid && nameCtrl.touched) {
+          <div class="text-red-500 text-xs mt-1">
+            <p [hidden]="!nameCtrl.errors?.['required']">שדה חובה</p>
+            <p [hidden]="!nameCtrl.errors?.['minlength']">שם חייב להכיל לפחות 2 תווים</p>
+          </div>
+          }
+        </div>
+        }
+
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm mb-2 font-semibold">דוא"ל</label>
+          <input ngModel name="email" type="email" required email #emailCtrl="ngModel" placeholder="your@email.com"
+            class="auth-input" [class.border-red-500]="emailCtrl.invalid && emailCtrl.touched">
+          @if (emailCtrl.invalid && emailCtrl.touched) {
+          <div class="text-red-500 text-xs mt-1">
+            <p [hidden]="!emailCtrl.errors?.['required']">שדה חובה</p>
+            <p [hidden]="!emailCtrl.errors?.['email']">כתובת אימייל לא תקינה</p>
+          </div>
+          }
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm mb-2 font-semibold">סיסמה</label>
+          <input ngModel name="password" type="password" required minlength="8" #passCtrl="ngModel"
+            placeholder="••••••••" class="auth-input" [class.border-red-500]="passCtrl.invalid && passCtrl.touched">
+          @if (passCtrl.invalid && passCtrl.touched) {
+          <div class="text-red-500 text-xs mt-1">
+            <p [hidden]="!passCtrl.errors?.['required']">שדה חובה</p>
+            <p [hidden]="!passCtrl.errors?.['minlength']">סיסמה חייבת להכיל לפחות 8 תווים</p>
+          </div>
+          }
+        </div>
+
+        @if (!isLogin()) {
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm mb-2 font-semibold">אימות סיסמה</label>
+          <input ngModel name="confirmPassword" type="password" required #confirmCtrl="ngModel" placeholder="••••••••"
+            class="auth-input" [class.border-red-500]="confirmCtrl.invalid && confirmCtrl.touched">
+          @if (confirmCtrl.invalid && confirmCtrl.touched) {
+          <div class="text-red-500 text-xs mt-1">
+            <p [hidden]="!confirmCtrl.errors?.['required']">שדה חובה</p>
+          </div>
+          }
+        </div>
+        }
+
+        @if (error()) {
+        <div class="error-message mt-6"> @if (isErrorList()) {
+          <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400">
+            <p class="font-semibold text-sm mb-2">⚠️ חסרות דרישות סיסמה:</p>
+            <ul class="text-xs list-disc list-inside space-y-1">
+              @for (msg of getErrorList(); track msg) {
+              <li>{{ msg }}</li>
+              }
+            </ul>
+          </div>
+          } @else {
+          <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 flex items-center gap-2">
+            <span class="text-lg">⚠️</span>
+            <div>
+              <p class="font-semibold text-sm">שגיאה</p>
+              <p class="text-xs">{{ getSingleError() }}</p>
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <button type="submit" [disabled]="authForm.invalid || loading()"
+          class="auth-button w-full py-3 mt-4 bg-accent-blue hover:bg-blue-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading() ? '⏳ טוען...' : (isLogin() ? 'התחבר' : 'הרשם') }}
+        </button>
+      </form>
+
+      <button (click)="demoLogin()"
+        class="auth-button-secondary w-full mt-4 text-center text-gray-400 hover:text-white transition-all text-sm">
+        🔑 כניסה דוגמה
+      </button>
+
+    </div>
+  </div>
+</div>

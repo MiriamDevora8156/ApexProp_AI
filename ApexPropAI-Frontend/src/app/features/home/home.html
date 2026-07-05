@@ -1,0 +1,102 @@
+<div class="home-root" dir="rtl" (keydown)="onKeydown($event)" tabindex="0">
+
+  <!-- ══════════════════════════════════════════════
+       RIGHT TOOLBAR — אייקונים בעמודה אנכית
+  ══════════════════════════════════════════════ -->
+  <app-right-toolbar [scanning]="scanning()" [scanResultCount]="scanResultCount()" [heatmapActive]="heatmapActive()"
+    [showHeatmapMenu]="showHeatmapMenu()" [heatmapLayer]="heatmapLayer()" [drawModeActive]="drawModeActive()"
+    [drawnPolygon]="!!drawnPolygon" [mapTileStyle]="mapTileStyle()" [drawerOpen]="drawerOpen()"
+    (scanClicked)="scanArea()" (heatmapMenuToggled)="showHeatmapMenu.update(v => !v)"
+    (heatmapLayerChanged)="setHeatmapLayer($event)" (heatmapToggled)="toggleHeatmap()"
+    (drawModeToggled)="toggleDrawMode()" (drawingCleared)="clearDrawing()" (mapStyleChanged)="setMapStyle($event)"
+    (drawerToggled)="drawerOpen.update(v => !v)">
+  </app-right-toolbar>
+
+  <!-- ══════════════════════════════════════════════
+       SEARCH STRIP
+  ══════════════════════════════════════════════ -->
+  <app-search-bar [searchTerm]="searchTerm()" [category]="category()" [compareCount]="compareService.count()"
+    [showAutocomplete]="showAutocomplete()" [autocompleteResults]="autocompleteResults()"
+    (searchChanged)="onSearchInput($event)" (searchCleared)="clearSearch()"
+    (autocompleteSelected)="selectAutocomplete($event)" (autocompleteHidden)="hideAutocomplete()"
+    (categoryChanged)="setCategory($event)">
+  </app-search-bar>
+
+  <!-- ══════════════════════════════════════════════
+       MAIN AREA
+  ══════════════════════════════════════════════ -->
+  <div class="main-area">
+
+    <!-- BLOB MAP -->
+    <div class="blob-wrap">
+      <div class="blob-frame" [style.--halo-color]="'var(--halo-color-current)'">
+
+        @if (drawModeActive()) {
+        <div class="draw-banner" role="status" aria-live="polite">
+          <i class="ph-bold ph-cursor-click"></i>
+          לחץ להוספת נקודות · לחץ פעמיים לסיום
+        </div>
+        }
+
+        <div id="apex-map" class="map-canvas" role="application" aria-label="מפת נכסים"></div>
+
+        <!-- Vignette Overlay -->
+        <div class="vignette-overlay" aria-hidden="true"></div>
+
+        <!-- Halo Overlay (Dynamic Color) -->
+        <div class="halo-overlay" [class.active]="haloActive()" [class.hovering]="hoveredPropertyId() !== null"
+          [style.--halo-color]="haloColor()" aria-hidden="true"></div>
+
+        @if (hudStats()) {
+        <div class="map-hud" aria-live="polite">
+          <span class="hud-pulse" aria-hidden="true"></span>
+          {{ hudStats()!.count }} נכסים &nbsp;·&nbsp; ממוצע {{ formatPrice(hudStats()!.avgPrice) }}
+          @if (heatmapActive()) {
+          &nbsp;·&nbsp;<span class="hud-ai"><i class="ph-bold ph-brain"></i> AI</span>
+          }
+        </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- RESULTS DRAWER -->
+    <div class="results-drawer" [class.open]="drawerOpen()" role="complementary" aria-label="תוצאות חיפוש">
+
+      <div class="results-drawer-flip-container">
+        <div class="results-drawer-flip" [class.flipped]="drawerShowingProperties()">
+
+          <!-- FRONT: Market Intelligence Dashboard -->
+          <div class="drawer-front">
+            <app-market-dashboard [marketStats]="marketStats()" [defaultStats]="defaultStats()"
+              [globalStats]="globalStats()" [featuredProperties]="featuredProperties()" [scanning]="scanning()"
+              (drawerClosed)="drawerOpen.set(false)" (scanClicked)="scanArea()"
+              (propertiesRequested)="toggleDrawerSide()" (cardScrollRequested)="scrollToCard($event)">
+            </app-market-dashboard>
+          </div>
+
+          <!-- BACK: Property List (Existing) -->
+          <div class="drawer-back">
+            <app-property-list [properties]="filteredProperties()" [loading]="loading()" [error]="error()"
+              [sortField]="sortField()" [hoveredPropertyId]="hoveredPropertyId()" [scanResultCount]="scanResultCount()"
+              [anomalyIds]="anomalyPropertyIds()" (sortChanged)="setSort($event)"
+              (propertyHovered)="hoveredPropertyId.set($event)" (refreshRequested)="refreshResults()"
+              (zoomOutRequested)="zoomOutAndScan()" (drawerClosed)="drawerOpen.set(false)"
+              (drawerSideToggled)="toggleDrawerSide()">
+            </app-property-list>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MOBILE BOTTOM SHEET -->
+  <app-mobile-sheet [drawerOpen]="drawerOpen()" [properties]="filteredProperties()"></app-mobile-sheet>
+
+  <!-- COMPARE FLOATER -->
+  <app-compare-floater></app-compare-floater>
+
+</div>

@@ -1,0 +1,43 @@
+<div class="search-strip" role="search">
+
+  <div class="search-field" [class.open]="showAutocomplete">
+    <i class="ph-bold ph-magnifying-glass search-icon"></i>
+    <input type="text" [value]="searchTerm" (input)="searchChanged.emit($event)"
+      (blur)="autocompleteHidden.emit()" placeholder="חפש עיר, שכונה או כתובת..."
+      class="search-input" aria-label="חיפוש נכס" autocomplete="off">
+    @if (searchTerm) {
+      <button class="search-clear" (click)="searchCleared.emit()" aria-label="נקה חיפוש">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    }
+    @if (showAutocomplete && autocompleteResults.length) {
+      <div class="autocomplete-list" role="listbox">
+        @for (item of autocompleteResults; track item.lat) {
+          <button class="autocomplete-item" role="option" (mousedown)="autocompleteSelected.emit(item)">
+            <i class="ph-bold ph-map-pin"></i>
+            {{ item.label | slice:0:55 }}{{ item.label.length > 55 ? '...' : '' }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="cat-group" role="group" aria-label="סוג נכס">
+    @for (cat of categories; track cat.key) {
+      <button class="cat-chip" [class.active]="category === cat.key"
+        (click)="categoryChanged.emit(cat.key)" [attr.aria-pressed]="category === cat.key">
+        <i [class]="cat.icon"></i>
+        <span>{{ cat.label }}</span>
+      </button>
+    }
+  </div>
+
+  <a routerLink="/compare" class="compare-pill" aria-label="זירת השוואה">
+    <i class="ph-bold ph-scales"></i>
+    <span>השוואה</span>
+    @if (compareCount > 0) {
+      <span class="compare-count">{{ compareCount }}</span>
+    }
+  </a>
+
+</div>

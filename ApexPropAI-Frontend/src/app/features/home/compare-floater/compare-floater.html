@@ -1,0 +1,17 @@
+@if (compareService.count() > 1) {
+<div class="compare-floater" role="status" aria-live="polite">
+  <i class="ph-bold ph-scales floater-icon"></i>
+  <div>
+    <p class="floater-title">השוואה פעילה</p>
+    <p class="floater-sub"><span>{{ compareService.count() }}</span> מתוך 4</p>
+  </div>
+  <div class="floater-actions">
+    <button (click)="compareService.clear()" class="floater-clear" aria-label="נקה">
+      <i class="ph-bold ph-x"></i>
+    </button>
+    <a routerLink="/compare" class="floater-launch">
+      שגר <i class="ph-bold ph-arrow-left"></i>
+    </a>
+  </div>
+</div>
+}

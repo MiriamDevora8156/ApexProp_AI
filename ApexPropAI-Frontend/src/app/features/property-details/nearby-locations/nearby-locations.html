@@ -1,0 +1,33 @@
+@if (nearbyLocations.length > 0) {
+<div class="glass-card p-6 rounded-3xl border border-accent-blue/20 bg-accent-blue/5">
+    <h3 class="text-lg font-bold text-accent-ice mb-1">🔍 מוסדות ציבור בסביבה</h3>
+    <p class="text-[#94A3B8] text-xs mb-4">{{ nearbyLocations.length }} מיקומים במרחק 1 ק"מ</p>
+    <div class="space-y-2">
+        @for (cat of getLocationsByCategory(); track cat.label) {
+        <div class="rounded-xl overflow-hidden border border-white/10">
+            <button (click)="toggleCategory(cat.label)"
+                class="w-full flex items-center justify-between px-4 py-3 bg-white/5 hover:bg-accent-blue/10 transition-all">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">{{ cat.icon }}</span>
+                    <span class="text-white font-semibold text-sm">{{ cat.label }}</span>
+                    <span class="bg-accent-blue/20 text-accent-ice text-xs font-bold px-2 py-0.5 rounded-full">{{
+                        cat.count }}</span>
+                </div>
+                <span class="text-[#94A3B8] text-xs transition-transform"
+                    [class.rotate-180]="openCategory() === cat.label">▼</span>
+            </button>
+            @if (openCategory() === cat.label) {
+            <div class="bg-black/20 border-t border-white/5">
+                @for (item of cat.items; track item.name) {
+                <div class="flex items-center gap-3 px-4 py-2 border-b border-white/5 last:border-0">
+                    <div class="w-1.5 h-1.5 rounded-full bg-accent-blue flex-shrink-0"></div>
+                    <p class="text-[#CBD5E1] text-sm">{{ item.name }}</p>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
+}

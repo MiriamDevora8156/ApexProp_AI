@@ -1,0 +1,48 @@
+<div class="min-h-screen bg-bg-primary text-white p-6 md:p-8" dir="rtl">
+  <div class="max-w-7xl mx-auto space-y-8">
+
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-black tracking-tighter">
+          Saved <span class="text-accent-ice">Properties</span>
+        </h1>
+        <p class="text-[#94A3B8] mt-1">הנכסים ששמרת למעקב</p>
+      </div>
+      <button routerLink="/home"
+        class="px-4 py-2 border border-white/20 rounded-xl text-[#94A3B8] hover:border-white hover:text-white transition-all text-sm">
+        ← חזור לחיפוש
+      </button>
+    </header>
+
+    @if (savedService.loading()) {
+    <div class="flex justify-center items-center py-20">
+      <div class="w-12 h-12 border-4 border-accent-blue/30 border-t-accent-blue rounded-full animate-spin"></div>
+    </div>
+    }
+
+    @if (!savedService.loading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      @for (property of savedService.savedList(); track property.id) {
+        <app-property-card 
+          [property]="property" 
+          (onToggleSaved)="removeProperty(property.id)" />
+      }
+      
+      @empty {
+      <div class="col-span-full text-center py-20 glass-card rounded-3xl border border-white/10">
+        <div class="text-6xl mb-4">🏠</div>
+        <h3 class="text-2xl font-bold mb-2">אין נכסים שמורים</h3>
+        <p class="text-[#94A3B8] mb-6">לחץ על הלב בכרטיסי הנכסים כדי לשמור אותם כאן</p>
+        <button routerLink="/home"
+          class="px-6 py-3 bg-accent-blue hover:bg-blue-600 text-white font-bold rounded-xl transition-all">
+          לחיפוש נכסים
+        </button>
+      </div>
+      }
+      
+    </div>
+    }
+
+  </div>
+</div>

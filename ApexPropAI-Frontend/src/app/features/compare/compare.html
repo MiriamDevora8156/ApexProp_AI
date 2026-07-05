@@ -1,0 +1,205 @@
+<div class="min-h-screen bg-bg-primary text-white p-6 md:p-8" dir="rtl">
+  <div class="max-w-7xl mx-auto space-y-8">
+
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-black tracking-tighter">
+          Comparison <span class="text-accent-ice">Arena</span>
+        </h1>
+        <p class="text-[#94A3B8] mt-1">השוואת נכסים מבוססת AI</p>
+      </div>
+      <div class="flex gap-3">
+        @if (compareList().length >= 2) {
+        <button (click)="shareUrl()" class="px-4 py-2 border rounded-xl transition-all text-sm font-bold"
+          [class.border-[#10B981]]="copied()" [class.text-[#10B981]]="copied()" [class.border-white/20]="!copied()"
+          [class.text-[#94A3B8]]="!copied()">
+          {{ copied() ? '✅ הועתק!' : '🔗 שתף השוואה' }}
+        </button>
+        }
+        <button routerLink="/home"
+          class="px-4 py-2 border border-white/20 rounded-xl text-[#94A3B8] hover:border-white hover:text-white transition-all text-sm">
+          ← חזור
+        </button>
+      </div>
+    </header>
+
+    @if (!profileDone()) {
+    <div class="glass-card p-8 rounded-3xl border border-accent-blue/20 bg-accent-blue/5">
+      <h2 class="text-xl font-bold text-accent-ice mb-6">👤 מה הפרופיל שלך?</h2>
+      <div class="space-y-6">
+
+        <div>
+          <p class="text-[#CBD5E1] font-semibold mb-3">מה חשוב לך יותר?</p>
+          <div class="flex flex-wrap gap-3">
+            @for (opt of [{v:'return',l:'תשואה מהירה'},{v:'longterm',l:'ערך לטווח ארוך'},{v:'living',l:'איכות חיים'}];
+            track opt.v) {
+            <button (click)="setProfile('goal', opt.v)"
+              class="px-5 py-2 rounded-xl border transition-all font-bold text-sm"
+              [class.border-accent-blue]="profile().goal === opt.v" [class.bg-accent-blue]="profile().goal === opt.v"
+              [class.text-white]="profile().goal === opt.v" [class.border-white/20]="profile().goal !== opt.v"
+              [class.text-[#94A3B8]]="profile().goal !== opt.v">
+              {{ opt.l }}
+            </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          <p class="text-[#CBD5E1] font-semibold mb-3">האופק שלך?</p>
+          <div class="flex flex-wrap gap-3">
+            @for (opt of [{v:'short',l:'1-3 שנים'},{v:'medium',l:'5-10 שנים'},{v:'home',l:'דירה למגורים'}]; track opt.v)
+            {
+            <button (click)="setProfile('horizon', opt.v)"
+              class="px-5 py-2 rounded-xl border transition-all font-bold text-sm"
+              [class.border-[#8c54ff]]="profile().horizon === opt.v" [class.bg-[#8c54ff]]="profile().horizon === opt.v"
+              [class.text-white]="profile().horizon === opt.v" [class.border-white/20]="profile().horizon !== opt.v"
+              [class.text-[#94A3B8]]="profile().horizon !== opt.v">
+              {{ opt.l }}
+            </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          <p class="text-[#CBD5E1] font-semibold mb-3">תקציב?</p>
+          <div class="flex flex-wrap gap-3">
+            @for (opt of [{v:'low',l:'עד 2M'},{v:'mid',l:'2-4M'},{v:'high',l:'4M+'}]; track opt.v) {
+            <button (click)="setProfile('budget', opt.v)"
+              class="px-5 py-2 rounded-xl border transition-all font-bold text-sm"
+              [class.border-[#10B981]]="profile().budget === opt.v" [class.bg-[#10B981]]="profile().budget === opt.v"
+              [class.text-white]="profile().budget === opt.v" [class.border-white/20]="profile().budget !== opt.v"
+              [class.text-[#94A3B8]]="profile().budget !== opt.v">
+              {{ opt.l }}
+            </button>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+    }
+
+    @if (compareList().length === 0) {
+    <div class="glass-card p-16 rounded-3xl text-center border border-white/5">
+      <p class="text-[#94A3B8] text-xl mb-4">לא נבחרו נכסים להשוואה</p>
+      <button routerLink="/home"
+        class="px-6 py-3 bg-accent-blue text-white font-bold rounded-xl hover:bg-[#2563EB] transition-all">
+        בחר נכסים מהרשימה
+      </button>
+    </div>
+    }
+
+    @if (compareList().length >= 2) {
+
+    <div class="glass-card p-8 rounded-3xl border border-white/5">
+      <h2 class="text-xl font-bold mb-6">📡 ניתוח רדאר השוואתי</h2>
+      <div class="max-w-lg mx-auto h-[350px]">
+        <canvas #radarChart></canvas>
+      </div>
+    </div>
+
+    @if (profileDone()) {
+    <div class="glass-card p-8 rounded-3xl border border-[#8c54ff]/30 bg-[#8c54ff]/5">
+      <h2 class="text-xl font-bold text-[#8c54ff] mb-4">🤖 שורת המחץ של ה-AI</h2>
+      @if (loadingVerdict()) {
+      <div class="flex items-center gap-3 text-[#94A3B8]">
+        <div class="w-5 h-5 border-2 border-[#8c54ff]/30 border-t-[#8c54ff] rounded-full animate-spin"></div>
+        מנתח את הנכסים...
+      </div>
+      } @else if (aiVerdict()) {
+      <p class="text-[#CBD5E1] leading-relaxed text-lg italic">"{{ aiVerdict() }}"</p>
+      <button (click)="fetchVerdict()" class="mt-4 text-xs text-[#8c54ff] hover:underline">
+        🔄 עדכן ניתוח AI
+      </button>
+      }
+    </div>
+    }
+
+    <div class="glass-card rounded-3xl border border-white/5 overflow-hidden">
+      <div class="p-6 border-b border-white/5 flex justify-between items-center">
+        <h2 class="text-xl font-bold">📊 טבלת השוואה</h2>
+        <button (click)="showAllFields.set(!showAllFields())"
+          class="text-sm text-accent-ice border border-accent-blue/30 px-4 py-1.5 rounded-lg hover:bg-accent-blue/10 transition-all">
+          {{ showAllFields() ? 'הצג פחות ▲' : 'הצג הכל ▼' }}
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-white/5">
+              <th class="p-4 text-right text-[#94A3B8] font-semibold w-32">שדה</th>
+              @for (p of compareList(); track p.id) {
+              <th class="p-4 text-center">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="font-bold text-white truncate max-w-[140px]">{{ p.title }}</span>
+                  <button (click)="removeFromCompare(p.id)" class="text-xs text-red-400 hover:text-red-300">✕
+                    הסר</button>
+                </div>
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of [{label:'מחיר', field:'price', format:'price'},
+            {label:'שטח (מ"ר)', field:'areaSqm', format:'num'},
+            {label:'חדרים', field:'rooms', format:'num'},
+            {label:'ציון AI', field:'aiScore', format:'score'},
+            {label:'מחיר/מ"ר', field:'pricePerSqm', format:'price'}]; track row.field) {
+            <tr class="border-b border-white/5 hover:bg-white/2 transition-colors">
+              <td class="p-4 text-[#94A3B8] text-sm font-semibold">{{ row.label }}</td>
+              @for (p of compareList(); track p.id; let i = $index) {
+              <td class="p-4 text-center">
+                <span class="font-bold text-lg"
+                  [class.text-accent-ice]="getBest(row.field === 'pricePerSqm' ? 'price' : $any(row.field)) === i"
+                  [style.color]="row.format === 'score' ? getScoreColor($any(p)[row.field]) : null">
+                  @if (row.format === 'price') { ₪{{ (row.field === 'pricePerSqm' ? p.price/p.areaSqm :
+                  $any(p)[row.field]) | number:'1.0-0' }} }
+                  @else { {{ $any(p)[row.field] | number:'1.1-1' }} }
+                </span>
+                @if (getBest(row.field === 'pricePerSqm' ? 'price' : $any(row.field)) === i) {
+                <span class="block text-xs text-accent-ice">👑</span>
+                }
+              </td>
+              }
+            </tr>
+            }
+            @if (showAllFields()) {
+            @for (row of [{label:'כתובת', field:'address'},{label:'ציון משוקלל', field:'weightedScore'},
+            {label:'מוסדות בסביבה', field:'nearbyCount'},{label:'תאריך רישום', field:'createdAt'}]; track row.field) {
+            <tr class="border-b border-white/5 bg-white/2">
+              <td class="p-4 text-[#94A3B8] text-sm font-semibold">{{ row.label }}</td>
+              @for (p of compareList(); track p.id) {
+              <td class="p-4 text-center text-[#CBD5E1] text-sm">
+                @if (row.field === 'address') { {{ p.address }} }
+                @else if (row.field === 'weightedScore') {
+                <span class="font-bold" [style.color]="getScoreColor(getWeightedScore(p))">{{ getWeightedScore(p)
+                  }}</span>
+                }
+                @else if (row.field === 'nearbyCount') { {{ p.nearbyLocations?.length ?? 0 }} }
+                @else if (row.field === 'createdAt') { {{ p.createdAt | date:'dd/MM/yy' }} }
+              </td>
+              }
+            </tr>
+            }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (profileDone() && suggestedProperties().length > 0) {
+    <div class="glass-card p-6 rounded-3xl border border-accent-blue/20 bg-accent-blue/5">
+      <h2 class="text-xl font-bold text-accent-ice mb-1">💡 נכסים שאולי פספסת</h2>
+      <p class="text-[#94A3B8] text-xs mb-6">ה-AI מצא נכסים בסביבה המתאימים לפרופיל שלך</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @for (p of suggestedProperties(); track p.id) {
+        <app-property-card [property]="p" mode="compare" (onAddCompare)="addToCompare($event)">
+        </app-property-card>
+        }
+      </div>
+    </div>
+    }
+
+    }
+  </div>
+</div>

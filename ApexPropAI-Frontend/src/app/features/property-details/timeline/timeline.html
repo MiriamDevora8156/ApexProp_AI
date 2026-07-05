@@ -1,0 +1,35 @@
+<div class="relative">
+    <div class="absolute right-[18px] top-0 bottom-0 w-0.5 bg-white/10"></div>
+    <div class="space-y-8">
+        @for (event of buildTimelineEvents(); track event.date; let isLast = $last) {
+        <div class="flex gap-4 items-start">
+            <div class="relative flex-shrink-0">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center text-base z-10 relative"
+                    [class.bg-accent-blue]="isLast" [class.bg-white/10]="!isLast"
+                    [style.box-shadow]="isLast ? '0 0 16px #3B82F6' : 'none'">
+                    {{ event.icon }}
+                </div>
+            </div>
+            <div class="flex-1 pb-2" [class.opacity-80]="!isLast">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm font-bold" [class.text-accent-ice]="isLast" [class.text-[#CBD5E1]]="!isLast">{{
+                        event.date }}</span>
+                    @if (event.change !== 0) {
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full" [class.bg-[#10B981]/20]="event.isPositive"
+                        [class.text-[#10B981]]="event.isPositive" [class.bg-red-500/20]="!event.isPositive"
+                        [class.text-red-400]="!event.isPositive">
+                        {{ event.isPositive ? '+' : '' }}{{ event.change }}%
+                    </span>
+                    }
+                </div>
+                <p class="text-white font-black text-xl mb-1">₪{{ (event.price | number:'1.0-0') }}</p>
+                <div class="flex items-start gap-2 bg-white/5 rounded-xl p-3 border border-white/5"
+                    [class.border-accent-blue/20]="isLast" [class.bg-accent-blue/5]="isLast">
+                    <span class="text-xs text-[#94A3B8] mt-0.5 flex-shrink-0">🤖</span>
+                    <p class="text-[#94A3B8] text-xs leading-relaxed">{{ event.aiReason }}</p>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>

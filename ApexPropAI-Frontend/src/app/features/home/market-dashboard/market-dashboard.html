@@ -1,0 +1,140 @@
+<div class="drawer-header-market">
+  <span class="drawer-title" style="flex:1">
+    <i class="ph-bold ph-chart-line"></i> מודיעין שוק
+  </span>
+  <button class="drawer-close" (click)="drawerClosed.emit()" aria-label="סגור">
+    <i class="ph-bold ph-x"></i>
+  </button>
+</div>
+
+<div class="drawer-body-market">
+  @if (marketStats; as stats) {
+
+  <div>
+    <div class="market-title">מגמת מחירים</div>
+    <div class="market-sparkline">
+      @for (val of stats.sparklineData; track $index) {
+      <div class="sparkline-bar"
+        [style.height.%]="(val / getMaxValue(stats.sparklineData)) * 100"
+        [title]="formatPrice(val)"></div>
+      }
+    </div>
+    <div style="font-size:9px;color:#94A3B8;margin-top:4px;text-align:center">
+      {{ formatPrice(getMinValue(stats.sparklineData)) }} –
+      {{ formatPrice(getMaxValue(stats.sparklineData)) }}
+    </div>
+  </div>
+
+  <div class="market-heatindex">
+    <div class="heatindex-label">🔥 מדד ביקוש באזור</div>
+    <div class="heatindex-bar">
+      <div class="heatindex-fill" [style.width]="stats.heatIndex + '%'"></div>
+    </div>
+    <div class="heatindex-value">{{ stats.heatIndex }}% ביקוש</div>
+  </div>
+
+  <div class="market-transactions">
+    <div class="market-title">עסקאות אחרונות</div>
+    @for (tx of stats.recentTransactions; track $index) {
+    <div class="transaction-item">
+      <span class="transaction-addr">{{ tx.address }}</span>
+      <div class="transaction-price">
+        <span>{{ formatPrice(tx.price) }}</span>
+        <span class="transaction-type">{{ tx.type === 'purchase' ? 'קנייה' : 'השכרה' }}</span>
+      </div>
+    </div>
+    }
+  </div>
+
+  <div style="font-size:10px;color:#94A3B8;padding:8px;border-top:1px solid rgba(148,163,184,0.1);margin-top:auto">
+    <strong style="color:#cbd5e1">{{ stats.areaDescription }}</strong><br />
+    מחיר ממוצע: <strong style="color:#fff">{{ formatPrice(stats.avgPrice) }}</strong><br />
+    שינוי: <strong [style.color]="stats.priceChange.startsWith('+') ? '#10B981' : '#ff6b6b'">
+      {{ stats.priceChange }}
+    </strong>
+  </div>
+
+  <button class="flip-toggle" (click)="propertiesRequested.emit()" style="margin-top:8px">
+    <i class="ph-bold ph-arrow-right"></i> הצג נכסים
+  </button>
+
+  } @else if (defaultStats; as stats) {
+
+  <div class="default-dashboard">
+    <div class="hero-section">
+      <div class="hero-icon"><i class="ph-bold ph-building-2"></i></div>
+      <h1 class="hero-title">ApexPropAI</h1>
+      <p class="hero-subtitle">מצא את הנכס הטוב ביותר בשוק</p>
+      <button class="hero-cta" (click)="scanClicked.emit()" [disabled]="scanning">
+        <i class="ph-bold ph-magnifying-glass"></i>
+        {{ scanning ? 'סורק...' : 'התחילו סריקה' }}
+      </button>
+    </div>
+
+    <div class="quick-stats">
+      @if (globalStats; as gstats) {
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ph-bold ph-buildings"></i></div>
+        <div class="stat-value">{{ gstats.totalProperties }}</div>
+        <div class="stat-label">נכסים</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ph-bold ph-currency-dollar"></i></div>
+        <div class="stat-value">{{ formatPrice(gstats.avgPrice) }}</div>
+        <div class="stat-label">ממוצע</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ph-bold ph-robot"></i></div>
+        <div class="stat-value">{{ gstats.avgScore }}</div>
+        <div class="stat-label">ציון AI</div>
+      </div>
+      }
+    </div>
+
+    <div class="market-pulse">
+      <div class="market-title"><i class="ph-bold ph-chart-line"></i>מגמת מחירים</div>
+      <div class="market-sparkline">
+        @for (val of stats.sparklineData; track $index) {
+        <div class="sparkline-bar"
+          [style.height.%]="(val / getMaxValue(stats.sparklineData)) * 100"
+          [title]="formatPrice(val)"></div>
+        }
+      </div>
+    </div>
+
+    <div class="market-heatindex">
+      <div class="heatindex-label"><i class="ph-bold ph-fire"></i>חום השוק</div>
+      <div class="heatindex-bar">
+        <div class="heatindex-fill" [style.width]="stats.heatIndex + '%'"></div>
+      </div>
+      <div class="heatindex-value">{{ stats.heatIndex }}% ביקוש כללי</div>
+    </div>
+
+    <div class="featured-section">
+      <div class="featured-title"><i class="ph-bold ph-star"></i>נכסים מומלצים</div>
+      <div class="featured-list">
+        @for (prop of featuredProperties; track prop.id) {
+        <div class="featured-card" (click)="cardScrollRequested.emit(prop.id)">
+          @if (prop.images[0]) {
+          <img [src]="prop.images[0]" [alt]="prop.title" class="featured-img">
+          }
+          <div class="featured-info">
+            <div class="featured-title-text">{{ prop.title }}</div>
+            <div class="featured-price">{{ formatPrice(prop.price) }}</div>
+            <div class="featured-score">AI {{ prop.aiScore }}</div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  } @else {
+  <div class="state-box">
+    <i class="ph-bold ph-chart-line state-icon"></i>
+    <p class="state-title">אין נתונים</p>
+    <p class="state-msg">סרוק אזור לצפייה בנתונים</p>
+  </div>
+  }
+
+</div>

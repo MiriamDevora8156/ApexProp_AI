@@ -1,0 +1,7 @@
+.custom-mat-tabs {
+  .mdc-tab__text-label { color: #94A3B8 !important; font-weight: 600; }
+  .mdc-tab--active .mdc-tab__text-label { color: #F1F5F9 !important; }
+  .mdc-tab-indicator__content--underline { border-color: #3B82F6 !important; }
+  .mat-mdc-tab-header { border-bottom: 1px solid rgba(148,163,184,0.12); }
+  .mat-mdc-tab-body-wrapper { background: transparent; }
+}

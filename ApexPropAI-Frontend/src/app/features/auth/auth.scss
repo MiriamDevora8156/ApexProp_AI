@@ -1,0 +1,27 @@
+.auth-box {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 2rem;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.input-cyber {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  color: white;
+  padding: 12px 16px;
+  width: 100%;
+  transition: all 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: #3B82F6;
+    background: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}

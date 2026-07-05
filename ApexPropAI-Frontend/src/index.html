@@ -1,0 +1,42 @@
+<!doctype html>
+<!--
+  ❌ מה היה שגוי:
+    <html lang="en"> — לא נכון לאפליקציה עברית.
+    Screen readers, מנועי חיפוש ודפדפנים משתמשים בזה
+    כדי לדעת את כיוון הטקסט והשפה. lang="en" גורם ל:
+    - Screen readers לקרוא עברית עם מבטא אנגלי
+    - Google לא להציג את הדף בתוצאות חיפוש בעברית
+    - כמה דפדפנים לא להציע תרגום נכון
+
+  ✅ מה תוקן:
+    lang="he" dir="rtl" ברמת ה-html.
+    ה-dir="rtl" ב-body יכול להישאר כפי שהוא בכל קומפוננט,
+    אבל כדאי שגם ה-root יהיה מוגדר נכון.
+-->
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>PropertyInsight AI</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ניתוח נדל״ן חכם עם בינה מלאכותית">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Phosphor Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/index.css"/>
+
+  <!-- Leaflet CSS — חייב להיות לפני ה-app bundle -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
